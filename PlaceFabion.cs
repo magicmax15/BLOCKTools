@@ -48,39 +48,42 @@ namespace BLOCKTools
                 string s = null;
 
                 if (cleanRooms != null)
-
-                foreach (Room r in cleanRooms)
                 {
-                    s += r.Name + " " + r.LookupParameter("BL_Класс чистоты").AsString() + "\n";
-
-                    // Определение границ помещений
-                    List<Line> roomBoundary = Utils.GetRoomBoundary(r);
-
-                    // Определение ориентации углов помещений
-                    List<string> roomCornerOrient = Utils.GetRoomCornerOrientation(roomBoundary);
-
-                    // Определение коорректирующих углов поворота для размещения фабионов
-                    List<int> fabionRotations = Utils.RoomAnglesOrientations(roomCornerOrient, roomBoundary);
-
-                    // Определение координат внутренних углов помещения
-                    List<Point> startPoints = Utils.GetInnerCornerList(roomBoundary, roomCornerOrient);
-
-                    // Базовый уровень помещения
-                    Level level = r.Level;
-
-                    for (int i = 0; i < startPoints.Count; i++)
+                    foreach (Room r in cleanRooms)
                     {
-                        Transaction trans = new Transaction(doc);
-                        trans.Start("Place fabion");
-                        XYZ location = startPoints[i].Coord;
-                        Line axis = Line.CreateBound(location, new XYZ(location.X, location.Y, location.Z + 10));
-                        FamilyInstance fabion = doc.Create.NewFamilyInstance(location, famSym, level, StructuralType.Column);
-                        ElementTransformUtils.RotateElement(doc, fabion.Id, axis, fabionRotations[i] * Math.PI / 180);
-                        trans.Commit();
+                        s += r.Name + " " + r.LookupParameter("BL_Класс чистоты").AsString() + "\n";
+
+                        // Определение границ помещений
+                        List<Line> roomBoundary = Utils.GetRoomBoundary(r);
+
+                        // Определение ориентации углов помещений
+                        List<string> roomCornerOrient = Utils.GetRoomCornerOrientation(roomBoundary);
+
+                        // Определение коорректирующих углов поворота для размещения фабионов
+                        List<int> fabionRotations = Utils.RoomAnglesOrientations(roomCornerOrient, roomBoundary);
+
+                        // Определение координат внутренних углов помещения
+                        List<Point> startPoints = Utils.GetInnerCornerList(roomBoundary, roomCornerOrient);
+
+                        // Базовый уровень помещения
+                        Level level = r.Level;
+
+                        for (int i = 0; i < startPoints.Count; i++)
+                        {
+                            Transaction trans = new Transaction(doc);
+                            trans.Start("Place fabion");
+                            XYZ location = startPoints[i].Coord;
+                            Line axis = Line.CreateBound(location, new XYZ(location.X, location.Y, location.Z + 10));
+                            FamilyInstance fabion = doc.Create.NewFamilyInstance(location, famSym, level, StructuralType.Column);
+                            ElementTransformUtils.RotateElement(doc, fabion.Id, axis, fabionRotations[i] * Math.PI / 180);
+                            trans.Commit();
+                        }
                     }
+
+                    TaskDialog.Show("Чистые помещения", s);
                 }
 
-                TaskDialog.Show("Чистые помещения", s);
+
             }
             catch (Autodesk.Revit.Exceptions.OperationCanceledException)
             {
