@@ -127,16 +127,12 @@ namespace BLOCKTools
 
             List<string> cornersOrientations = new List<string>();
             string orientation;
-            string s = null;
-            string vcross = null;
 
             XYZ v1 = normalizedVectors.Last();
             XYZ v2 = normalizedVectors[0];
             XYZ crossVector = v1.CrossProduct(v2);
-            //vcross += crossVector.Z + "\n";
             orientation = GetCornerOrientation(crossVector);
             cornersOrientations.Add(orientation);
-            //s += orientation + "\n";
             
             for (int i = 0; i < normalizedVectors.Count - 1; i++)
             {
