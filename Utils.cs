@@ -147,6 +147,26 @@ namespace BLOCKTools
 
             return cornersOrientations;
         }
+        
+        /// <summary>
+        /// Возвращает количество внутренних углов комнаты
+        /// </summary>
+        /// <param name="cornerList">список типов углов комнаты</param>
+        /// <returns></returns>
+        public static int GetInnerCornerCount(List<string> cornerList)
+        {
+            return (from c in cornerList where c.Equals("ВНУТ") select c).Count();
+        }
+
+        /// <summary>
+        /// Возвращает количество внешних углов
+        /// </summary>
+        /// <param name="cornerList">список типов углов комнаты</param>
+        /// <returns></returns>
+        public static int GetOutterCornerCount(List<string> cornerList)
+        {
+            return (from c in cornerList where c.Equals("ВНЕШ") select c).Count();
+        }
 
         /// <summary>
         /// Вовзращает угол между вектором v и базовым ветором [0, -1, 0] 
