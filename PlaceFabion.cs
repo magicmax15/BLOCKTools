@@ -9,6 +9,7 @@ using System.Collections;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB.Structure;
 
+
 namespace BLOCKTools
 {
     [TransactionAttribute(TransactionMode.Manual)]
@@ -32,7 +33,6 @@ namespace BLOCKTools
 
             string komaxitMatName = "BFC_KX9016";
             Material komaxitMat = new FilteredElementCollector(doc).OfClass(typeof(Material)).Cast<Material>().Where(q => q.Name == komaxitMatName).First();
-
 
             try
             {
@@ -79,54 +79,71 @@ namespace BLOCKTools
                         // Базовый уровень помещения
                         Level level = r.Level;
 
-                        // Расстановка фабионов в углах чистых помещений
-                        for (int i = 0; i < startPoints.Count; i++)
+                        using (Transaction t = new Transaction(doc, "Place fabions"))
                         {
-                            trans = new Transaction(doc);
-                            trans.Start("Place fabion");
-                            XYZ location = startPoints[i].Coord;
-                            Line axis = Line.CreateBound(location, new XYZ(location.X, location.Y, location.Z + 10));
-                            FamilyInstance fabion = doc.Create.NewFamilyInstance(location, famSym, level, StructuralType.Column);
-                            ElementTransformUtils.RotateElement(doc, fabion.Id, axis, fabionRotations[i] * Math.PI / 180);
-                            trans.Commit();
+                            t.Start();
+
+                            // Расстановка фабионов в углах чистых помещений
+                            for (int i = 0; i < startPoints.Count; i++)
+                            {
+
+                                XYZ location = startPoints[i].Coord;
+                                Line axis = Line.CreateBound(location, new XYZ(location.X, location.Y, location.Z + 10));
+                                FamilyInstance fabion = doc.Create.NewFamilyInstance(location, famSym, level, StructuralType.Column);
+                                ElementTransformUtils.RotateElement(doc, fabion.Id, axis, fabionRotations[i] * Math.PI / 180);
+
+                                // Установить расчет количества "0" - подсчет по длине заказа
+                                fabion.LookupParameter("BFC_Pocet_prvku").Set(0);
+
+                                // Установить размер для заказа
+                                fabion.LookupParameter("BFC_Rozmer").Set(UnitUtils.ConvertToInternalUnits(3500, UnitTypeId.Millimeters));
+
+                                // Установить высоту фабиона по полной высоте помещения
+                                fabion.LookupParameter("BFC_Delka_prvku").Set(r.UnboundedHeight);
+
+                                // Установить смещение снизу для фабиона
+                                fabion.get_Parameter(BuiltInParameter.FAMILY_BASE_LEVEL_OFFSET_PARAM).Set(r.BaseOffset);
+
+                            }
+
+                            // Заполнение параметра потолочных фабионов
+                            Parameter paramDM1 = r.LookupParameter("BFC_DM1_Polozka");
+                            paramDM1.Set("FB");
+                            Parameter paramDM1pocet = r.LookupParameter("BFC_DM1_Pocet_prvku");
+                            paramDM1pocet.Set(0);
+                            Parameter paramDM1rozmer = r.LookupParameter("BFC_DM1_Rozmer");
+                            paramDM1rozmer.Set(0);
+                            Parameter paramDM1material = r.LookupParameter("BFC_DM1_Material");
+                            paramDM1material.Set(komaxitMat.Id);
+
+                            // Заполнение параметров угловых внутренних скруглений
+                            Parameter paramDM2poloz = r.LookupParameter("BFC_DM2_Polozka");
+                            paramDM2poloz.Set("3F");
+                            Parameter paramDM2pocet = r.LookupParameter("BFC_DM2_Pocet_prvku");
+                            paramDM2pocet.Set(innerCornerCount);
+                            Parameter paramDM2rozmer = r.LookupParameter("BFC_DM2_Rozmer");
+                            paramDM2rozmer.Set(1);
+                            Parameter paramDM2material = r.LookupParameter("BFC_DM2_Material");
+                            paramDM2material.Set(komaxitMat.Id);
+
+                            // Заполнение параметров угловных наружных скруглений
+                            if (outerCornerCount > 0)
+                            {
+                                Parameter paramDM3 = r.LookupParameter("BFC_DM3_Polozka");
+                                paramDM3.Set("2FV");
+                                Parameter paramDM3pocet = r.LookupParameter("BFC_DM3_Pocet_prvku");
+                                paramDM3pocet.Set(outerCornerCount);
+                                Parameter paramDM3rozmer = r.LookupParameter("BFC_DM3_Rozmer");
+                                paramDM3rozmer.Set(1);
+                                Parameter paramDM3material = r.LookupParameter("BFC_DM3_Material");
+                                paramDM3material.Set(komaxitMat.Id);
+                            }
+
+                            t.Commit();
                         }
 
-                        trans = new Transaction(doc);
-                        trans.Start("Заполнение параметров фабионов и угловых элементов в помещении");
-                        // Заполнение параметра потолочных фабионов
-                        Parameter paramDM1 = r.LookupParameter("BFC_DM1_Polozka");
-                        paramDM1.Set("FB");
-                        Parameter paramDM1pocet = r.LookupParameter("BFC_DM1_Pocet_prvku");
-                        paramDM1pocet.Set(0);
-                        Parameter paramDM1rozmer = r.LookupParameter("BFC_DM1_Rozmer");
-                        paramDM1rozmer.Set(0);
-                        Parameter paramDM1material = r.LookupParameter("BFC_DM1_Material");
-                        paramDM1material.Set(komaxitMat.Id);
 
-                        // Заполнение параметров угловых внутренних скруглений
-                        Parameter paramDM2poloz = r.LookupParameter("BFC_DM2_Polozka");
-                        paramDM2poloz.Set("3F");
-                        Parameter paramDM2pocet = r.LookupParameter("BFC_DM2_Pocet_prvku");
-                        paramDM2pocet.Set(innerCornerCount);
-                        Parameter paramDM2rozmer = r.LookupParameter("BFC_DM2_Rozmer");
-                        paramDM2rozmer.Set(1);
-                        Parameter paramDM2material = r.LookupParameter("BFC_DM2_Material");
-                        paramDM2material.Set(komaxitMat.Id);
-
-                        // Заполнение параметров угловных наружных скруглений
-                        if (outerCornerCount > 0)
-                        {
-                            Parameter paramDM3 = r.LookupParameter("BFC_DM3_Polozka");
-                            paramDM3.Set("2FV");
-                            Parameter paramDM3pocet = r.LookupParameter("BFC_DM3_Pocet_prvku");
-                            paramDM3pocet.Set(outerCornerCount);
-                            Parameter paramDM3rozmer = r.LookupParameter("BFC_DM3_Rozmer");
-                            paramDM3rozmer.Set(1);
-                            Parameter paramDM3material = r.LookupParameter("BFC_DM3_Material");
-                            paramDM3material.Set(komaxitMat.Id);
-                        }
-
-                        trans.Commit();
+                       
 
                         /***
                         using (Transaction transaction = new Transaction(doc)) 
