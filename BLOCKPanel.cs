@@ -4,6 +4,7 @@ using System.Reflection;
 using System.IO;
 using System.Windows.Media.Imaging;
 
+
 namespace BLOCKTools
 {
     class BLOCKPanel : IExternalApplication
@@ -17,26 +18,84 @@ namespace BLOCKTools
         {
             var assembly = Assembly.GetExecutingAssembly();
 
-            PushButtonData pushButtonData = new PushButtonData(
-                "BLOCK_PlaceFabionBtn", 
-                "Place Fabion", 
-                assembly.Location, 
-                "BLOCKTools.PlaceFabion");
-
-            pushButtonData.LongDescription = "Разместить вертикальные фабионы";
-
-            // Ищем путь к файлу изображения
-            var assemblyDir = new FileInfo(assembly.Location).DirectoryName;
-            var imagePath = Path.Combine(assemblyDir, "Icon1.ico");
-            pushButtonData.LargeImage = new BitmapImage(new Uri(imagePath));
+            //PushButtonData placeFabionBTNData = CreatePlaceFabionBtn(assembly);
 
             // Создаем новую панель на вкладке Надстройки 
             var panel = app.CreateRibbonPanel(0, "BLOCK Tools");
 
             // Добавляем кнопку на панель
-            panel.AddItem(pushButtonData);
+
+            //PushButton placeFabionBTN = panel.AddItem(placeFabionBTNData) as PushButton;
+            //AddSplitButtonG(panel, assembly);
+
+            AddPulldownButtonGroup(panel, assembly);
 
             return Result.Succeeded;
+        }
+
+        PushButtonData CreatePlaceFabionBtn(Assembly assembly)
+        {
+            PushButtonData pushButtonData = new PushButtonData(
+                                            "BLOCK_PlaceFabionBtn",
+                                            "Place Fabions",
+                                            assembly.Location,
+                                            "BLOCKTools.PlaceFabion");
+
+            pushButtonData.LongDescription = "Разместить фабионы и угловые вставки";
+
+            // Ищем путь к файлу изображения
+            var assemblyDir = new FileInfo(assembly.Location).DirectoryName;
+            var imagePath = Path.Combine(assemblyDir, "Icon1.ico");
+            pushButtonData.LargeImage = new BitmapImage(new Uri(imagePath));
+            return pushButtonData;
+        }
+
+        // Создание выпадающей группы команд BLOCKTools 
+        private void AddPulldownButtonGroup(RibbonPanel panel, Assembly assembly)
+        {
+            var assemblyDir = new FileInfo(assembly.Location).DirectoryName;
+            // Выпадающая кнопка
+            PulldownButtonData blockToolsGroupData = new PulldownButtonData("BLOCKTools", "BLOCK Tools");
+            blockToolsGroupData.LargeImage = new BitmapImage(new Uri(Path.Combine(assemblyDir, "Icon1.ico")));
+            PulldownButton blockToolsGroup = panel.AddItem(blockToolsGroupData) as PulldownButton;
+            
+
+            // Кнопка "Разместить фабионы"
+            PushButtonData placeFabionsData = new PushButtonData("PlaceFabionsBtn", "Фабионы", assembly.Location, "BLOCKTools.PlaceFabion");
+            placeFabionsData.LongDescription = "Размещение вертикальных фабионов в пространстве модели в помещениях с классом чистоты, размещение " +
+                "горизонтальных фабионов и угловых вставок в параметрах помещений";
+            placeFabionsData.ToolTip = "Размещение фабионов и угловых вставок";
+            PushButton placeFabionsBtn = blockToolsGroup.AddPushButton(placeFabionsData) as PushButton;
+            placeFabionsBtn.LargeImage = new BitmapImage(new Uri(Path.Combine(assemblyDir, "fabion_16x16.ico")));
+        }
+
+        private void AddSplitButtonG(RibbonPanel ribbonPanel, Assembly assembly)
+        {
+            var assemblyDir = new FileInfo(assembly.Location).DirectoryName;
+
+            var bd0 = new PulldownButtonData("A", "A");
+            var bd1 = new PulldownButtonData("B", "B");
+            var bd2 = new PulldownButtonData("C", "C");
+
+            var stackedItems = ribbonPanel.AddStackedItems(
+              bd0, bd1, bd2);
+
+            var button0 = (PulldownButton)stackedItems[0];
+
+            string sid = string.Join(
+              "%",
+              "CustomCtrl_",
+              "CustomCtrl_",
+              "BLOCK Tolls",
+              ribbonPanel.Name,
+              button0.Name);
+
+            var splitButton = new Autodesk.Windows.RibbonSplitButton();
+
+            
+            splitButton.IsSplit = true;
+            splitButton.Image = new BitmapImage(new Uri(Path.Combine(assemblyDir, "Icon1.ico")));
+
         }
     }
 }
