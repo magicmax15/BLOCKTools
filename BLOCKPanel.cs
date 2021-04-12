@@ -25,9 +25,6 @@ namespace BLOCKTools
 
             // Добавляем кнопку на панель
 
-            //PushButton placeFabionBTN = panel.AddItem(placeFabionBTNData) as PushButton;
-            //AddSplitButtonG(panel, assembly);
-
             AddPulldownButtonGroup(panel, assembly);
 
             return Result.Succeeded;
@@ -67,35 +64,6 @@ namespace BLOCKTools
             placeFabionsData.ToolTip = "Размещение фабионов и угловых вставок";
             PushButton placeFabionsBtn = blockToolsGroup.AddPushButton(placeFabionsData) as PushButton;
             placeFabionsBtn.LargeImage = new BitmapImage(new Uri(Path.Combine(assemblyDir, "fabion_16x16.ico")));
-        }
-
-        private void AddSplitButtonG(RibbonPanel ribbonPanel, Assembly assembly)
-        {
-            var assemblyDir = new FileInfo(assembly.Location).DirectoryName;
-
-            var bd0 = new PulldownButtonData("A", "A");
-            var bd1 = new PulldownButtonData("B", "B");
-            var bd2 = new PulldownButtonData("C", "C");
-
-            var stackedItems = ribbonPanel.AddStackedItems(
-              bd0, bd1, bd2);
-
-            var button0 = (PulldownButton)stackedItems[0];
-
-            string sid = string.Join(
-              "%",
-              "CustomCtrl_",
-              "CustomCtrl_",
-              "BLOCK Tolls",
-              ribbonPanel.Name,
-              button0.Name);
-
-            var splitButton = new Autodesk.Windows.RibbonSplitButton();
-
-            
-            splitButton.IsSplit = true;
-            splitButton.Image = new BitmapImage(new Uri(Path.Combine(assemblyDir, "Icon1.ico")));
-
         }
     }
 }

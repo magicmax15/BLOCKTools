@@ -141,21 +141,6 @@ namespace BLOCKTools
 
                             t.Commit();
                         }
-
-
-                       
-
-                        /***
-                        using (Transaction transaction = new Transaction(doc)) 
-                        {
-
-                            if (transaction.Start("Заполнение параметров фабионов и угловых элементов в помещении") == TransactionStatus.Started)
-                            {
-                                r.LookupParameter("BFC_DM1_Polozka").SetValueString("FB");
-                                transaction.Commit();
-                            }
-                        }
-                                                ***/
                     }
 
                     TaskDialog.Show("Чистые помещения", s);
