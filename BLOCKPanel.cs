@@ -23,28 +23,10 @@ namespace BLOCKTools
             // Создаем новую панель на вкладке Надстройки 
             var panel = app.CreateRibbonPanel(0, "BLOCK Tools");
 
-            // Добавляем кнопку на панель
-
+            // Добавляем выпадающую кнопку на панель
             AddPulldownButtonGroup(panel, assembly);
 
             return Result.Succeeded;
-        }
-
-        PushButtonData CreatePlaceFabionBtn(Assembly assembly)
-        {
-            PushButtonData pushButtonData = new PushButtonData(
-                                            "BLOCK_PlaceFabionBtn",
-                                            "Place Fabions",
-                                            assembly.Location,
-                                            "BLOCKTools.PlaceFabion");
-
-            pushButtonData.LongDescription = "Разместить фабионы и угловые вставки";
-
-            // Ищем путь к файлу изображения
-            var assemblyDir = new FileInfo(assembly.Location).DirectoryName;
-            var imagePath = Path.Combine(assemblyDir, "Icon1.ico");
-            pushButtonData.LargeImage = new BitmapImage(new Uri(imagePath));
-            return pushButtonData;
         }
 
         // Создание выпадающей группы команд BLOCKTools 
@@ -53,7 +35,7 @@ namespace BLOCKTools
             var assemblyDir = new FileInfo(assembly.Location).DirectoryName;
             // Выпадающая кнопка
             PulldownButtonData blockToolsGroupData = new PulldownButtonData("BLOCKTools", "BLOCK Tools");
-            blockToolsGroupData.LargeImage = new BitmapImage(new Uri(Path.Combine(assemblyDir, "Icon1.ico")));
+            blockToolsGroupData.LargeImage = new BitmapImage(new Uri(Path.Combine(assemblyDir, "resources/Icon1.ico")));
             PulldownButton blockToolsGroup = panel.AddItem(blockToolsGroupData) as PulldownButton;
             
 
@@ -63,7 +45,14 @@ namespace BLOCKTools
                 "горизонтальных фабионов и угловых вставок в параметрах помещений";
             placeFabionsData.ToolTip = "Размещение фабионов и угловых вставок";
             PushButton placeFabionsBtn = blockToolsGroup.AddPushButton(placeFabionsData) as PushButton;
-            placeFabionsBtn.LargeImage = new BitmapImage(new Uri(Path.Combine(assemblyDir, "fabion_16x16.ico")));
+            placeFabionsBtn.LargeImage = new BitmapImage(new Uri(Path.Combine(assemblyDir, "resources/fabion_16x16.ico")));
+
+            // Кнопка "Разместить все потолки"
+            PushButtonData placeAllCeilingsData = new PushButtonData("PlaceAllCeilingsBtn", "Потолки", assembly.Location, "BLOCKTools.PlaceAllCeilings");
+            placeAllCeilingsData.LongDescription = "Автоматическое размещение потолков в помещениях с классом чистоты на высоту согласно положению верхней границы помещения";
+            placeAllCeilingsData.ToolTip = "Размещение потолков в помещениях с классом чистоты";
+            PushButton placeAllCeilingsBtn = blockToolsGroup.AddPushButton(placeAllCeilingsData) as PushButton;
+            placeAllCeilingsBtn.LargeImage = new BitmapImage(new Uri(Path.Combine(assemblyDir, "resources/ceiling_16x16.ico")));
         }
     }
 }

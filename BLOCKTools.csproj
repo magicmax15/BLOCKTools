@@ -85,9 +85,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BLOCKPanel.cs" />
+    <Compile Include="PlaceAllCeilings.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="PlaceFabion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="resources\ceiling_16x16.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\fabion_16x16.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\Icon1.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
