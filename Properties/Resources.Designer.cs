@@ -59,5 +59,14 @@ namespace BLOCKTools.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Error.
+        /// </summary>
+        internal static string _Error {
+            get {
+                return ResourceManager.GetString("_Error", resourceCulture);
+            }
+        }
     }
 }

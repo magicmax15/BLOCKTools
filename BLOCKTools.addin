@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
- <AddIn Type="Command">
- <Assembly>Z:\REVIT_RU\18_Стандарты и общие ресурсы\В разработке\Скрипты\BLOCKTools\bin\Debug\Lab1PlaceGroup.dll</Assembly>
- <ClientId>502fe383-2648-4e98-adf8-5e6047f9dc34</ClientId>
- <FullClassName>Lab1PlaceGroup</FullClassName>
-<Text>Lab1PlaceGroup</Text>
-<VendorId>ADSK</VendorId>
- <VisibilityMode>AlwaysVisible</VisibilityMode>
- </AddIn>
+  <AddIn Type="Application">
+    <Name>BLOCKTools</Name>
+    <Assembly>"C:\ProgramData\Autodesk\Revit\Addins\2021\BLOCKTools\BLOCKTools.dll"</Assembly>
+    <FullClassName>BLOCKTools.App</FullClassName>
+    <ClientId>cd9a3442-7a74-4617-984c-648c9572be37</ClientId>
+    <VendorId>BLOCK</VendorId>
+    <VendorDescription>http://adn-cis.org</VendorDescription>
+  </AddIn>
 </RevitAddIns>
