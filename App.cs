@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using System.Threading;
 using System.Windows.Threading;
 using Autodesk.Revit.UI.Events;
+using System.Xml.Serialization;
 
 namespace BLOCKTools
 {
@@ -13,15 +14,23 @@ namespace BLOCKTools
     {
         public static App ThisApp;
 
-        private Ui uiForm;
-
         // Отдельный поток для запуска UI на нем
         private Thread uiThread;
 
+        public Ui UiForm { get; set; }
+
+        // Класс с настройками
+        private BTSettings settings;
+        public BTSettings Settings { get => settings; set => settings = value; }
+
         public Result OnStartup(UIControlledApplication app)
         {
-            uiForm = null; // диалоговое окно должно появляться только после вызова команды
+            UiForm = null; // диалоговое окно должно появляться только после вызова команды
             ThisApp = this; // статический доступ к экземпляру приложения
+
+            // Инициализируем настройки из файла настроек
+            Settings = new BTSettings();
+            Utils.DeserializeSettings();
 
             var assembly = Assembly.GetExecutingAssembly();
 
@@ -46,6 +55,11 @@ namespace BLOCKTools
 
         public Result OnShutdown(UIControlledApplication app)
         {
+            if (UiForm != null && UiForm.IsVisible)
+            {
+                UiForm.Close();
+            }
+            
             return Result.Succeeded;
         }
 
@@ -109,14 +123,14 @@ namespace BLOCKTools
         public void ShowForm(UIApplication uiapp)
         {
             // Если форма еще не создана, то создадим её
-            //if (uiForm != null && uiForm == null) return;
+            if (UiForm != null) return;
             //Внешние события с аргументами
             EventHandlerWithStringArg evStr = new EventHandlerWithStringArg();
             EventHandlerWithWpfArg evWpf = new EventHandlerWithWpfArg();
 
             // The dialog becomes the owner responsible for disposing the objects given to it.
-            uiForm = new Ui(uiapp, evStr, evWpf);
-            uiForm.Show();
+            UiForm = new Ui(uiapp, evStr, evWpf);
+            UiForm.Show();
         }
 
         /// <summary>
@@ -139,9 +153,9 @@ namespace BLOCKTools
                     new DispatcherSynchronizationContext(
                         Dispatcher.CurrentDispatcher));
                 // The dialog becomes the owner responsible for disposing the objects given to it.
-                uiForm = new Ui(uiapp, evStr, evWpf);
-                uiForm.Closed += (s, e) => Dispatcher.CurrentDispatcher.InvokeShutdown();
-                uiForm.Show();
+                UiForm = new Ui(uiapp, evStr, evWpf);
+                UiForm.Closed += (s, e) => Dispatcher.CurrentDispatcher.InvokeShutdown();
+                UiForm.Show();
                 Dispatcher.Run();
             });
         }
@@ -163,6 +177,10 @@ namespace BLOCKTools
         }
 
         #endregion
+
+
+
+
     }
 
 

@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="BTSettings.cs" />
     <Compile Include="EntryCommand.cs" />
     <Compile Include="EntryCommandSeparateThread.cs" />
     <Compile Include="Methods.cs" />

@@ -10,11 +10,15 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB.Structure;
 using System.Threading;
 using System.Diagnostics;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace BLOCKTools
 {
-    class Utils
+    static class Utils
     {
+
+                
         /// <summary>
         /// Возвращает список всех чистых помещений
         /// </summary>
@@ -49,6 +53,94 @@ namespace BLOCKTools
                                      select e as Room).ToList<Room>();
 
             return cleanRooms;
+        }
+
+        /// <summary>
+        /// Возвращает список всех помещений
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        public static List<Room> GetAllRooms(Document doc)
+        {
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            RoomFilter roomFilter = new RoomFilter();
+            collector.WherePasses(roomFilter);
+            List<Room> rooms = (from e in collector.ToElements()
+                                     where e is Room
+                                     select e as Room).ToList<Room>();
+
+            return rooms;
+        }
+
+        /// <summary>
+        /// Фильтрует список помещений по заданному правилу
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="spGuid"></param>
+        /// <param name="rule"></param>
+        /// <returns></returns>
+        public static List<Room> RoomListFilter(Document doc, FilterRule rule)
+        {
+            List<Room> rooms = GetAllRooms(doc);
+            List<ElementId> roomsID = (from r in rooms select r.Id).ToList<ElementId>(); 
+            ElementParameterFilter filter = new ElementParameterFilter(rule, true);
+            
+
+            return rooms;
+        }
+
+        /// <summary>
+        /// Возвращает список комнат для установки в них вертикальных фабионов согласно настройкам программы
+        /// </summary>
+        /// <param name="ui"></param>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        public static List<Room> GetAllRoomWithVertFab (Document doc)
+        {
+            // Получаем доступ к экземпляру класса настроек
+            BTSettings settings = App.ThisApp.Settings;
+
+            // GUID параметра "BL_Класс чистоты"
+            Guid spGuid = new Guid("02f7e9d4-f055-479e-a36f-5b8e098d40f5");
+
+            List<Room> rooms = GetAllRooms(doc);
+            Parameter testSharedParam = rooms[0].get_Parameter(spGuid);
+            ElementId sharedParamId = testSharedParam.Id;
+            ParameterValueProvider provider = new ParameterValueProvider(sharedParamId);
+            FilterStringRuleEvaluator fsreEqual = new FilterStringEquals();
+            RoomFilter roomFilter = new RoomFilter();
+            FilteredElementCollector collector = new FilteredElementCollector(doc).
+                WherePasses(roomFilter);
+
+            Dictionary<string, bool> markedClass = new Dictionary<string, bool>
+            {
+                {"A", settings.VertFabInAClass},
+                {"B", settings.VertFabInBClass},
+                {"C", settings.VertFabInCClass},
+                {"D", settings.VertFabInDClass},
+                {"CNC", settings.VertFabInCNCClass}
+            };
+
+            // Убрать из списка помещения без заполеннного класса чистоты
+            string testVoidStrCNC = "";
+            FilterRule fVoidStrRule = new FilterStringRule(provider, fsreEqual, testVoidStrCNC, false);
+            ElementParameterFilter paramNoVoidFilter = new ElementParameterFilter(fVoidStrRule, true);
+            collector.WherePasses(paramNoVoidFilter);
+
+            string testStr = null;
+            foreach (string s in markedClass.Keys)
+            {
+                if (markedClass[s] == false)
+                {
+                    testStr = s;
+                    FilterRule fStrRule = new FilterStringRule(provider, fsreEqual, testStr, false);
+                    ElementParameterFilter fStrRuleFilter = new ElementParameterFilter(fStrRule, true);
+                    collector.WherePasses(fStrRuleFilter);
+                }
+            }
+
+            return (from e in collector.ToElements()
+                    select e as Room).ToList<Room>();
         }
 
         /// <summary>
@@ -343,5 +435,36 @@ namespace BLOCKTools
             Debug.WriteLine(ex.Source);
             Debug.WriteLine(ex.StackTrace);
         }
+
+        /// <summary>
+        /// Экспортирует текущее состояние класса BTSettings (настройки) в файл .xml
+        /// </summary>
+        public static void SerializeSettings()
+        {
+            XmlSerializer formatter = new XmlSerializer(typeof(BTSettings));
+
+            // получаем поток, куда будем записывать сериализованный объект
+            using (FileStream fs = new FileStream("D:/settings.xml", FileMode.OpenOrCreate))
+            {
+                formatter.Serialize(fs, App.ThisApp.Settings);
+
+                Console.WriteLine("Объект сериализован");
+            }
+        }
+
+        /// <summary>
+        /// Импортирует настройки из файла .xml в состояние класса BTSettings
+        /// </summary>
+        public static void DeserializeSettings()
+        {
+            XmlSerializer formatter = new XmlSerializer(typeof(BTSettings));
+
+            using (FileStream fs = new FileStream("D:/settings.xml", FileMode.OpenOrCreate))
+            {
+                App.ThisApp.Settings  = (BTSettings)formatter.Deserialize(fs);
+            }
+
+        }
+
     }
 }

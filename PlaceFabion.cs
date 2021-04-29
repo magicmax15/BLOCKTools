@@ -33,10 +33,11 @@ namespace BLOCKTools
 
             string komaxitMatName = "BFC_KX9016";
             Material komaxitMat = new FilteredElementCollector(doc).OfClass(typeof(Material)).Cast<Material>().Where(q => q.Name == komaxitMatName).First();
+          
 
             try
             {
-                List<Room> cleanRooms = Utils.GetAllCleanRooms(doc);
+                List<Room> cleanRooms = Utils.GetAllRoomWithVertFab(doc);
                 IDictionary cornersOrientations = new Dictionary<Room, IList<string>>();
 
                 // Удалим все ранее созданные фабионы, если они были размещены в проекте

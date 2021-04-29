@@ -4,9 +4,9 @@ using Autodesk.Revit.UI;
 namespace BLOCKTools
 {
     /// <summary>
-    /// This is an example of of wrapping a method with an ExternalEventHandler using a string argument.
-    /// Any type of argument can be passed to the RevitEventWrapper, and therefore be used in the execution
-    /// of a method which has to take place within a "Valid Revit API Context".
+    /// Это пример упаковки метода с помощью ExternalEventHandler с использованием строкового аргумента.
+    /// Любой тип аргумента может быть передан в RevitEventWrapper и, следовательно, может использоваться
+    /// при выполнении метода, который должен выполняться в "Корректном контексте Revit API"
     /// </summary>
     public class EventHandlerWithStringArg : RevitEventWrapper<string>
     {
@@ -41,6 +41,7 @@ namespace BLOCKTools
             UIDocument uiDoc = uiApp.ActiveUIDocument;
             Document doc = uiDoc.Document;
 
+            /***
             bool cbDocumentDataIsChecked = false;
             ui.Dispatcher.Invoke(() => cbDocumentDataIsChecked = ui.CbDocumentData.IsChecked.GetValueOrDefault());
 
@@ -48,7 +49,7 @@ namespace BLOCKTools
             ui.Dispatcher.Invoke(() => cbSheetDataIsChecked = ui.CbSheetData.IsChecked.GetValueOrDefault());
 
             bool cbWallDataIsChecked = false;
-            ui.Dispatcher.Invoke(() => cbWallDataIsChecked = ui.CbWallData.IsChecked.GetValueOrDefault());
+
 
             // METHODS
             if (cbDocumentDataIsChecked)
@@ -65,6 +66,16 @@ namespace BLOCKTools
             {
                 Methods.WallInfo(ui, doc);
             }
+            ***/
+        }
+    }
+
+     public class PlaceFabionEventHandler : RevitEventWrapper<Ui>
+    {
+        public override void Execute(UIApplication uiApp, Ui ui)
+        {
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
         }
     }
 }
