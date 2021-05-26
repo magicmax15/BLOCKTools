@@ -29,6 +29,10 @@
                     </StackPanel>
                 </TabItem.Header>
                 <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="47*"/>
+                        <RowDefinition Height="31*"/>
+                    </Grid.RowDefinitions>
                     <Label Content="Вертикальные фабионы" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                     <CheckBox x:Name="CBFabVertClA" Content="A" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" IsChecked="True"/>
                     <CheckBox x:Name="CBFabVertClB" Content="B" Margin="43,41,0,0" VerticalAlignment="Top" IsChecked="True" HorizontalAlignment="Left" Width="27"/>
@@ -36,7 +40,12 @@
                     <CheckBox x:Name="CBFabVertClD" Content="D" HorizontalAlignment="Left" Margin="107,41,0,0" VerticalAlignment="Top" IsChecked="True"/>
                     <CheckBox x:Name="CBFabVertClCNC" Content="CNC" HorizontalAlignment="Left" Margin="140,41,0,0" VerticalAlignment="Top"/>
                     <Label Content="Горизонтальные фабионы" HorizontalAlignment="Left" Margin="10,70,0,0" VerticalAlignment="Top"/>
-                    <Button x:Name="BtnApplyFab" Content="Применить" Margin="0,0,10,10" Click="btnApplyFab_Click" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+                    <Button x:Name="BtnApplyFab" Content="Применить" Margin="0,0,10,10" Click="btnApplyFab_Click" VerticalAlignment="Bottom" HorizontalAlignment="Right" Grid.Row="1"/>
+                    <CheckBox x:Name="CBFabHorClA" Content="A" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="True" Margin="10,100,0,0"/>
+                    <CheckBox x:Name="CBFabHorClB" Content="B" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="True" Margin="43,100,0,0"/>
+                    <CheckBox x:Name="CBFabHorClC" Content="C" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="True" Margin="75,100,0,0"/>
+                    <CheckBox x:Name="CBFabHorClD" Content="D" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="True" Margin="107,100,0,0"/>
+                    <CheckBox x:Name="CBFabHorClCNC" Content="CNC" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="140,100,0,0"/>
                 </Grid>
             </TabItem>
         </TabControl>

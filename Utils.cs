@@ -17,8 +17,9 @@ namespace BLOCKTools
 {
     static class Utils
     {
+        static string CLEAN_CLASS_SPARAM_GUID_STR = "02f7e9d4-f055-479e-a36f-5b8e098d40f5";
 
-                
+        static Guid CLEAN_CLASS_SPARAM_GUID = new Guid(CLEAN_CLASS_SPARAM_GUID_STR);
         /// <summary>
         /// Возвращает список всех чистых помещений
         /// </summary>
@@ -30,10 +31,9 @@ namespace BLOCKTools
 
             // Настройка фильтра для комнат заданным параметром "BL_Класс чистоты",
             // равным "A", "B", "C" или "D"
-            Guid spGuid = new Guid("02f7e9d4-f055-479e-a36f-5b8e098d40f5");
             Room fRoom = collector.FirstElement() as Room;
 
-            Parameter testSharedParam = fRoom.get_Parameter(spGuid);
+            Parameter testSharedParam = fRoom.get_Parameter(CLEAN_CLASS_SPARAM_GUID);
             ElementId sharedParamId = testSharedParam.Id;
             ParameterValueProvider provider = new ParameterValueProvider(sharedParamId);
             FilterStringRuleEvaluator fsreEqual = new FilterStringEquals();
@@ -60,16 +60,56 @@ namespace BLOCKTools
         /// </summary>
         /// <param name="doc"></param>
         /// <returns></returns>
-        public static List<Room> GetAllRooms(Document doc)
+        public static List<Room> GetAllRoomList(Document doc)
         {
-            FilteredElementCollector collector = new FilteredElementCollector(doc);
-            RoomFilter roomFilter = new RoomFilter();
-            collector.WherePasses(roomFilter);
+            FilteredElementCollector collector = GetAllRoomCollector(doc);
             List<Room> rooms = (from e in collector.ToElements()
                                      where e is Room
                                      select e as Room).ToList<Room>();
 
             return rooms;
+        }
+
+        /// <summary>
+        /// Возвращает FilteredElementCollector из всех помещений в модели
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        public static FilteredElementCollector GetAllRoomCollector(Document doc)
+        {
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            RoomFilter roomFilter = new RoomFilter();
+            collector.WherePasses(roomFilter);
+            return collector;
+        }
+
+        /// <summary>
+        /// Возвращает коллектор из всех помещений с заполненным параметром "BL_Класс чистоты"
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        public static FilteredElementCollector GetAllCleanRoomCollector (Document doc)
+        {
+            // GUID параметра "BL_Класс чистоты"
+
+            List<Room> rooms = GetAllRoomList(doc);
+            ParameterValueProvider provider = GetSharedParameterProvider(CLEAN_CLASS_SPARAM_GUID_STR, rooms[0]);
+            FilterStringRuleEvaluator fsreEqual = new FilterStringEquals();
+            FilteredElementCollector collector = GetAllRoomCollector(doc);
+            // Убрать из списка помещения без заполеннного класса чистоты
+            string testVoidStrCNC = "";
+            FilterRule fVoidStrRule = new FilterStringRule(provider, fsreEqual, testVoidStrCNC, false);
+            ElementParameterFilter paramNoVoidFilter = new ElementParameterFilter(fVoidStrRule, true);
+            collector.WherePasses(paramNoVoidFilter);
+            return collector;
+        }
+
+        public static ParameterValueProvider GetSharedParameterProvider(String guidStr, Element elem)
+        {
+            Guid guid = new Guid(guidStr);
+            Parameter testSharedParam = elem.get_Parameter(guid);
+            ElementId sharedParamId = testSharedParam.Id;
+            return new ParameterValueProvider(sharedParamId);
         }
 
         /// <summary>
@@ -81,13 +121,14 @@ namespace BLOCKTools
         /// <returns></returns>
         public static List<Room> RoomListFilter(Document doc, FilterRule rule)
         {
-            List<Room> rooms = GetAllRooms(doc);
+            List<Room> rooms = GetAllRoomList(doc);
             List<ElementId> roomsID = (from r in rooms select r.Id).ToList<ElementId>(); 
             ElementParameterFilter filter = new ElementParameterFilter(rule, true);
-            
-
+ 
             return rooms;
         }
+
+
 
         /// <summary>
         /// Возвращает список комнат для установки в них вертикальных фабионов согласно настройкам программы
@@ -100,17 +141,12 @@ namespace BLOCKTools
             // Получаем доступ к экземпляру класса настроек
             BTSettings settings = App.ThisApp.Settings;
 
-            // GUID параметра "BL_Класс чистоты"
-            Guid spGuid = new Guid("02f7e9d4-f055-479e-a36f-5b8e098d40f5");
+            // Получаем коллекцию всех помещений с заполеннным классом чистоты
+            FilteredElementCollector collector = GetAllCleanRoomCollector(doc);
 
-            List<Room> rooms = GetAllRooms(doc);
-            Parameter testSharedParam = rooms[0].get_Parameter(spGuid);
-            ElementId sharedParamId = testSharedParam.Id;
-            ParameterValueProvider provider = new ParameterValueProvider(sharedParamId);
-            FilterStringRuleEvaluator fsreEqual = new FilterStringEquals();
-            RoomFilter roomFilter = new RoomFilter();
-            FilteredElementCollector collector = new FilteredElementCollector(doc).
-                WherePasses(roomFilter);
+            ParameterValueProvider provider = GetSharedParameterProvider(
+                CLEAN_CLASS_SPARAM_GUID_STR, 
+                collector.FirstElement());
 
             Dictionary<string, bool> markedClass = new Dictionary<string, bool>
             {
@@ -121,19 +157,13 @@ namespace BLOCKTools
                 {"CNC", settings.VertFabInCNCClass}
             };
 
-            // Убрать из списка помещения без заполеннного класса чистоты
-            string testVoidStrCNC = "";
-            FilterRule fVoidStrRule = new FilterStringRule(provider, fsreEqual, testVoidStrCNC, false);
-            ElementParameterFilter paramNoVoidFilter = new ElementParameterFilter(fVoidStrRule, true);
-            collector.WherePasses(paramNoVoidFilter);
-
             string testStr = null;
             foreach (string s in markedClass.Keys)
             {
                 if (markedClass[s] == false)
                 {
                     testStr = s;
-                    FilterRule fStrRule = new FilterStringRule(provider, fsreEqual, testStr, false);
+                    FilterRule fStrRule = new FilterStringRule(provider, new FilterStringEquals(), testStr, false);
                     ElementParameterFilter fStrRuleFilter = new ElementParameterFilter(fStrRule, true);
                     collector.WherePasses(fStrRuleFilter);
                 }
@@ -141,6 +171,13 @@ namespace BLOCKTools
 
             return (from e in collector.ToElements()
                     select e as Room).ToList<Room>();
+        }
+
+        public static List<Room> GetAllRoomWithHorFab (Document doc)
+        {
+            
+            
+            return;
         }
 
         /// <summary>
@@ -421,6 +458,11 @@ namespace BLOCKTools
             ICollection<ElementId> elementsId = (from e in elements select e.Id).ToList();
 
             ICollection<ElementId> deletedIdSet = document.Delete(elementsId);
+        }
+
+        public static void ClearHorFabions(Document doc)
+        {
+
         }
 
         public static void LogThreadInfo(string name = "")

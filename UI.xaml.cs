@@ -114,7 +114,7 @@ namespace BLOCKTools
 
         public void ReadSettings()
         {
-            
+         
             CBFabVertClA.IsChecked = settings.VertFabInAClass;
             CBFabVertClB.IsChecked = settings.VertFabInBClass;
             CBFabVertClC.IsChecked = settings.VertFabInCClass;
