@@ -173,12 +173,14 @@ namespace BLOCKTools
                     select e as Room).ToList<Room>();
         }
 
+        /***
         public static List<Room> GetAllRoomWithHorFab (Document doc)
         {
             
             
             return;
         }
+        ***/
 
         /// <summary>
         /// Возвращает список из Curve, составляющих границу помещения
@@ -454,7 +456,7 @@ namespace BLOCKTools
         /// </summary>
         public static void DeleteElements(Document document, List<Element> elements)
         {
-            // Delete all the selected elements via the set of elements
+            // Удаляет все элементы через список элементов
             ICollection<ElementId> elementsId = (from e in elements select e.Id).ToList();
 
             ICollection<ElementId> deletedIdSet = document.Delete(elementsId);

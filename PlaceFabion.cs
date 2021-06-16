@@ -37,7 +37,7 @@ namespace BLOCKTools
             try
             {
                 PlaceVertFabs();
-                PlaceGorFabs();
+                //PlaceGorFabs();
             }
 
             catch (Autodesk.Revit.Exceptions.OperationCanceledException)
