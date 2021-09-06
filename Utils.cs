@@ -39,14 +39,20 @@ namespace BLOCKTools
             FilterStringRuleEvaluator fsreEqual = new FilterStringEquals();
 
             string testStrCNC = "CNC";
+            string testStrK = "K";
+            string testStrKrus = "К";
             string testVoidStrCNC = "";
             FilterRule fCNCRule = new FilterStringRule(provider, fsreEqual, testStrCNC, false);
             FilterRule fVoidStrRule = new FilterStringRule(provider, fsreEqual, testVoidStrCNC, false);
+            FilterRule fKRule = new FilterStringRule(provider, fsreEqual, testStrK, false);
+            FilterRule fKrusRule = new FilterStringRule(provider, fsreEqual, testStrKrus, false);
 
             ElementParameterFilter paramNoCNCFilter = new ElementParameterFilter(fCNCRule, true);
             ElementParameterFilter paramNoVoidFilter = new ElementParameterFilter(fVoidStrRule, true);
+            ElementParameterFilter paramNoKFilter = new ElementParameterFilter(fKRule, true);
+            ElementParameterFilter paramNoKrusFilter = new ElementParameterFilter(fKrusRule, true);
 
-            collector.WherePasses(paramNoVoidFilter).WherePasses(paramNoCNCFilter);
+            collector.WherePasses(paramNoVoidFilter).WherePasses(paramNoCNCFilter).WherePasses(paramNoKFilter).WherePasses(paramNoKrusFilter);
 
             List<Room> cleanRooms = (from e in collector.ToElements()
                                      where e is Room
@@ -154,7 +160,9 @@ namespace BLOCKTools
                 {"B", settings.VertFabInBClass},
                 {"C", settings.VertFabInCClass},
                 {"D", settings.VertFabInDClass},
-                {"CNC", settings.VertFabInCNCClass}
+                {"CNC", settings.VertFabInCNCClass},
+                {"K", settings.VertFabInCNCClass},
+                {"К", settings.VertFabInCNCClass}
             };
 
             string testStr = null;
