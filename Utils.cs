@@ -34,8 +34,8 @@ namespace BLOCKTools
 
             string testStrCNC = "CNC";
             string testVoidStrCNC = "";
-            FilterRule fCNCRule = new FilterStringRule(provider, fsreEqual, testStrCNC, false);
-            FilterRule fVoidStrRule = new FilterStringRule(provider, fsreEqual, testVoidStrCNC, false);
+            FilterRule fCNCRule = new FilterStringRule(provider, fsreEqual, testStrCNC);
+            FilterRule fVoidStrRule = new FilterStringRule(provider, fsreEqual, testVoidStrCNC);
 
             ElementParameterFilter paramNoCNCFilter = new ElementParameterFilter(fCNCRule, true);
             ElementParameterFilter paramNoVoidFilter = new ElementParameterFilter(fVoidStrRule, true);

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30517.126
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLOCKTools", "BLOCKTools.csproj", "{CD9A3442-7A74-4617-984C-648C9572BE37}"
 EndProject
@@ -13,8 +13,8 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CD9A3442-7A74-4617-984C-648C9572BE37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CD9A3442-7A74-4617-984C-648C9572BE37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD9A3442-7A74-4617-984C-648C9572BE37}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{CD9A3442-7A74-4617-984C-648C9572BE37}.Debug|Any CPU.Build.0 = Debug|x64
 		{CD9A3442-7A74-4617-984C-648C9572BE37}.Debug|x64.ActiveCfg = Debug|x64
 		{CD9A3442-7A74-4617-984C-648C9572BE37}.Debug|x64.Build.0 = Debug|x64
 		{CD9A3442-7A74-4617-984C-648C9572BE37}.Release|Any CPU.ActiveCfg = Release|Any CPU
